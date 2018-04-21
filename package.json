@@ -9,8 +9,7 @@
   },
   "eslintConfig": {
     "env": {
-      "browser": true,
-      "node": true
+      "browser": true
     },
     "extends": [
       "standard"
