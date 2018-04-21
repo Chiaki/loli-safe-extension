@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "lolisafe Uploader",
+  "description": "Uploader for lolisafe",
+  "version": "2018.4.22.1",
+  "options_ui": {
+    "browser_style": true,
+    "open_in_tab": true,
+    "page": "settings.html"
+  },
+  "icons": {
+    "48": "logo-48x48.png",
+    "128": "logo-128x128.png"
+  },
+  "permissions": [
+    "<all_urls>",
+    "clipboardWrite",
+    "menus",
+    "notifications",
+    "storage",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "background": {
+    "scripts": ["axios.min.js", "background.js"]
+  },
+  "applications": {
+    "gecko": {
+      "id": "lolisafe-extension@BobbyWibowoB.addons.mozilla.org"
+    }
+  }
+}
