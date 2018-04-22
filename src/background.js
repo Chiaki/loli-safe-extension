@@ -226,7 +226,7 @@ function upload (url, pageURL, albumid) {
         notifications.update(notification, {
           type: 'basic',
           message: 'Upload completed.',
-          contextMessage: 'URL copied to your clipboard.'
+          contextMessage: response.data.files[0].url
         })
         notifications.clear(notification, 5000)
       } else {
