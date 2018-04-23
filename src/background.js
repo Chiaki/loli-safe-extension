@@ -105,34 +105,11 @@ async function createMenus () {
       type: 'separator'
     })
 
-    axios({
+    const list = await axios({
       method: 'get',
       url: `${config.textDomain}/api/albums`,
       headers: {
         token: config.textToken
-      }
-    }).then(list => {
-      if (list.data.albums.length === 0) {
-        browser.menus.create({
-          title: 'No albums available',
-          parentId: menus.parent,
-          contexts,
-          type: 'normal',
-          enabled: false
-        })
-      } else {
-        browser.menus.create({
-          title: 'Upload to:',
-          parentId: menus.parent,
-          contexts,
-          type: 'normal',
-          enabled: false
-        })
-
-        list.data.albums.forEach(album => {
-          console.log(album.id, album.name)
-          menus.createMenu(album.id, album.name)
-        })
       }
     }).catch(error => {
       console.error(error)
@@ -144,6 +121,31 @@ async function createMenus () {
         enabled: false
       })
     })
+
+    if (!list) { return }
+
+    if (list.data.albums.length === 0) {
+      browser.menus.create({
+        title: 'No albums available',
+        parentId: menus.parent,
+        contexts,
+        type: 'normal',
+        enabled: false
+      })
+    } else {
+      browser.menus.create({
+        title: 'Upload to:',
+        parentId: menus.parent,
+        contexts,
+        type: 'normal',
+        enabled: false
+      })
+
+      list.data.albums.forEach(album => {
+        console.log(album.id, album.name)
+        menus.createMenu(album.id, album.name)
+      })
+    }
   }
 }
 
@@ -181,70 +183,76 @@ browser.webRequest.onBeforeSendHeaders.addListener(details => {
   return {requestHeaders: details.requestHeaders}
 }, {urls: ['<all_urls>']}, ['blocking', 'requestHeaders'])
 
-function upload (url, pageURL, albumid) {
+async function upload (url, pageURL, albumid) {
   const notification = notifications.create('basic', 'Retrieving file\u2026', null, true)
+
+  const errored = error => {
+    console.error(error)
+    notifications.update(notification, {
+      type: 'basic',
+      message: error.toString(),
+      contextMessage: url
+    })
+  }
 
   refererHeader = pageURL // Sets the Page URl as the referer url
 
-  axios({
+  const file = await axios({
     method: 'get',
     url,
     responseType: 'blob'
-  }).then((file) => {
-    refererHeader = null // Set to null after we're done with it
+  }).catch(errored)
 
-    notifications.update(notification, {
-      type: 'progress',
-      message: 'Uploading\u2026',
-      progress: 0
-    })
+  if (!file) { return }
 
-    const data = new FormData()
-    data.append('files[]', file.data, 'upload' + fileExt(file.data.type))
+  refererHeader = null // Set to null after we're done with it
 
-    const options = {
-      method: 'POST',
-      url: config.textDomain + '/api/upload',
-      data,
-      headers: {},
-      onUploadProgress (progress) {
-        notifications.update(notification, {
-          progress: Math.round((progress.loaded * 100) / progress.total)
-        })
-      }
-    }
-
-    if (config.textToken) { options.headers['token'] = config.textToken }
-
-    if (albumid && config.textToken) {
-      options.url = options.url + '/' + albumid
-    }
-
-    axios(options).then(response => {
-      if (response.data.success === true) {
-        copyText(response.data.files[0].url)
-        notifications.update(notification, {
-          type: 'basic',
-          message: 'Upload completed.',
-          contextMessage: response.data.files[0].url
-        })
-        notifications.clear(notification, 5000)
-      } else {
-        notifications.update(notification, {
-          type: 'basic',
-          message: response.data.description,
-          contextMessage: url
-        })
-      }
-    }).catch(error => {
-      console.error(error)
-      notifications.update(notification, {
-        type: 'basic',
-        message: error.toString(),
-        contextMessage: url
-      })
-    })
+  notifications.update(notification, {
+    type: 'progress',
+    message: 'Uploading\u2026',
+    progress: 0
   })
+
+  const data = new FormData()
+  data.append('files[]', file.data, 'upload' + fileExt(file.data.type))
+
+  const options = {
+    method: 'POST',
+    url: config.textDomain + '/api/upload',
+    data,
+    headers: {},
+    onUploadProgress (progress) {
+      notifications.update(notification, {
+        progress: Math.round((progress.loaded * 100) / progress.total)
+      })
+    }
+  }
+
+  if (config.textToken) { options.headers['token'] = config.textToken }
+
+  if (albumid && config.textToken) {
+    options.url = options.url + '/' + albumid
+  }
+
+  const response = await axios(options).catch(errored)
+
+  if (!response) { return }
+
+  if (response.data.success === true) {
+    copyText(response.data.files[0].url)
+    notifications.update(notification, {
+      type: 'basic',
+      message: 'Upload completed.',
+      contextMessage: response.data.files[0].url
+    })
+    notifications.clear(notification, 5000)
+  } else {
+    notifications.update(notification, {
+      type: 'basic',
+      message: response.data.description,
+      contextMessage: url
+    })
+  }
 }
 
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -253,7 +261,7 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 })
 
-const uploadScreenshot = (blob, albumid) => {
+async function uploadScreenshot (blob, albumid) {
   const notification = notifications.create('progress', 'Uploading\u2026', null, true, 0)
 
   const data = new FormData()
@@ -277,30 +285,32 @@ const uploadScreenshot = (blob, albumid) => {
     options.url = options.url + '/' + albumid
   }
 
-  axios(options).then(response => {
-    if (response.data.success === true) {
-      copyText(response.data.files[0].url)
-      notifications.update(notification, {
-        type: 'basic',
-        message: 'Upload completed.',
-        contextMessage: response.data.files[0].url
-      })
-      notifications.clear(notification, 5000)
-    } else {
-      notifications.update(notification, {
-        type: 'basic',
-        message: 'An error occurred.',
-        contextMessage: response.data.description
-      })
-    }
-  }).catch((error, a) => {
-    console.log(error, a)
+  const response = await axios(options).catch(error => {
+    console.log(error)
     notifications.update(notification, {
       type: 'basic',
       message: 'An error occurred.',
       contextMessage: error.toString()
     })
   })
+
+  if (!response) { return }
+
+  if (response.data.success === true) {
+    copyText(response.data.files[0].url)
+    notifications.update(notification, {
+      type: 'basic',
+      message: 'Upload completed.',
+      contextMessage: response.data.files[0].url
+    })
+    notifications.clear(notification, 5000)
+  } else {
+    notifications.update(notification, {
+      type: 'basic',
+      message: 'An error occurred.',
+      contextMessage: response.data.description
+    })
+  }
 }
 
 const mimetypes = {
@@ -324,13 +334,19 @@ const fileExt = mimetype => {
 }
 
 const copyText = text => {
-  const input = document.createElement('textarea')
-  document.body.appendChild(input)
-  input.value = text
-  input.focus()
-  input.select()
-  document.execCommand('Copy')
-  input.remove()
+  // Firefox...
+  browser.tabs.executeScript({
+    code: `
+      (function () {
+        const input = document.createElement('textarea')
+        document.body.appendChild(input)
+        input.value = ${JSON.stringify(text)}
+        input.select()
+        document.execCommand('Copy')
+        input.remove()
+      })()
+    `
+  })
 }
 
 // http://stackoverflow.com/a/16245768
@@ -361,6 +377,7 @@ const b64toBlob = (b64Data, contentType, sliceSize) => {
 var notifications = {
   caches: new Map(),
   compatibility (_options) {
+    // Sad...
     const options = {}
     Object.assign(options, _options)
 
@@ -404,13 +421,18 @@ var notifications = {
     return id
   },
   update (id, options) {
-    // Firefox does not have notifications.update()
+    // Firefox does not have notifications.update()...
     const properties = ['title', 'message', 'type', 'iconUrl']
+
     if (!properties.every(property => options[property] !== undefined)) {
       const cache = notifications.caches.get(id)
+
       if (!cache) { return }
+
       properties.map(property => {
-        if (options[property] === undefined) { options[property] = cache[property] }
+        if (options[property] === undefined) {
+          options[property] = cache[property]
+        }
       })
     }
 
@@ -418,8 +440,9 @@ var notifications = {
     browser.notifications.create(id, notifications.compatibility(options))
   },
   clear (id, timeout) {
-    setTimeout(() => {
-      browser.notifications.clear(id).then(() => notifications.caches.delete(id))
+    setTimeout(async () => {
+      await browser.notifications.clear(id)
+      notifications.caches.delete(id)
     }, timeout || 0)
   }
 }
