@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "lolisafe Uploader",
   "description": "Uploader for lolisafe",
-  "version": "2018.10.13.5",
+  "version": "2018.10.13.6",
   "options_ui": {
     "browser_style": true,
     "page": "options.html"
