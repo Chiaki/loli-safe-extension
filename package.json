@@ -2,41 +2,9 @@
   "name": "lolisafe-extension",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint ./src/background.js ./src/main.js",
-    "build": "cd ./src && web-ext build -a ./../web-ext-artifacts --overwrite-dest",
-    "sign": "cd ./src && web-ext sign -a ./../web-ext-artifacts",
-    "debug": "cd ./src && web-ext run --verbose"
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true
-    },
-    "extends": [
-      "standard"
-    ],
-    "rules": {
-      "curly": [
-        "error",
-        "all"
-      ],
-      "prefer-const": [
-        "error",
-        {
-          "destructuring": "any",
-          "ignoreReadBeforeAssign": false
-        }
-      ],
-      "object-shorthand": [
-        "error",
-        "always"
-      ],
-      "quotes": [
-        "error",
-        "single"
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "**/*.min.js"
-  ]
+    "lint": "eslint",
+    "build": "web-ext build -a ./web-ext-artifacts -i README.md sign.sh web-ext-artifacts --overwrite-dest",
+    "sign": "web-ext sign -a ./web-ext-artifacts-i README.md sign.sh web-ext-artifacts",
+    "debug": "web-ext run --verbose -i README.md sign.sh web-ext-artifacts"
+  }
 }

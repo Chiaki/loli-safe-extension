@@ -1,0 +1,34 @@
+{
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "env": {
+    "browser": true
+  },
+  "extends": [
+    "standard"
+  ],
+  "rules": {
+    "curly": [
+      "error",
+      "all"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "object-shorthand": [
+      "error",
+      "always"
+    ],
+    "prefer-const": [
+      "error",
+      {
+        "destructuring": "any",
+        "ignoreReadBeforeAssign": false
+      }
+    ],
+    "no-var": "error"
+  }
+}

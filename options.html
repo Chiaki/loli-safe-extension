@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    .row {
+      margin-bottom: 10px;
+    }
+
+    .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .buttons {
+      text-align: right;
+    }
+
+    label {
+      display: block;
+    }
+
+    input[type="text"] {
+      display: block;
+      width: 100%;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="row">
+    This page will help you setup your lolisafe extension so you can rehost images/audio/videos by right clicking on them.<br>
+    For this to work you need to provide the domain where lolisafe is running.<br>
+    If you want to keep track of your uploads and be able to create albums to store them, you should create an account on the website and paste the token here, so that every upload gets tied to your account, enabling you to go back to the site and see all of your uploaded files.
+  </div>
+
+  <div class="row">
+    <label for="textDomain">Domain on which lolisafe is running:</label>
+    <input type="text" id="textDomain" placeholder="https://safe.fiery.me" />
+  </div>
+
+  <div class="row">
+    <label for="textToken">Your token (optional):</label>
+    <input type="text" id="textToken" placeholder="" />
+  </div>
+
+  <div class="row buttons">
+    <input type="button" id="reset" value="Reset" />
+    <input type="button" id="save" value="Save" />
+  </div>
+
+  <script src="options.js"></script>
+</body>

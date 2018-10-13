@@ -2,11 +2,10 @@
   "manifest_version": 2,
   "name": "lolisafe Uploader",
   "description": "Uploader for lolisafe",
-  "version": "2018.4.23.1",
+  "version": "2018.10.13.5",
   "options_ui": {
     "browser_style": true,
-    "open_in_tab": true,
-    "page": "settings.html"
+    "page": "options.html"
   },
   "icons": {
     "48": "logo-48x48.png",
@@ -23,7 +22,10 @@
     "webRequestBlocking"
   ],
   "background": {
-    "scripts": ["axios.min.js", "background.js"]
+    "scripts": [
+      "axios.min.js",
+      "background.js"
+    ]
   },
   "applications": {
     "gecko": {

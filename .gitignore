@@ -1,2 +1,6 @@
+# Files
+/.web-extension-id
+/sign.sh
+
+# Folders
 /web-ext-artifacts/
-/src/.web-extension-id
