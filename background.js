@@ -337,7 +337,7 @@ const fileExt = function (mimetype) {
 }
 
 const copyText = function (text) {
-  // Firefox...
+  // Firefox can't copy to clipboard from background script
   browser.tabs.executeScript({
     code: `
       (function () {
@@ -380,7 +380,7 @@ const b64toBlob = function (b64Data, contentType, sliceSize) {
 const notifications = {
   caches: new Map(),
   compatibility (_options) {
-    // Sad...
+    // For Firefox, due to very limited notification support
     const options = {}
     Object.assign(options, _options)
 
@@ -442,7 +442,11 @@ const notifications = {
     }
 
     notifications.caches.set(id, options)
-    browser.notifications.create(id, notifications.compatibility(options))
+    // Calling create() with the same ID will not make Firefox remove the previous notification
+    // Not sure if this is working though
+    browser.notifications.clear(id, function () { console.log('cleared') })
+    browser.notifications.create(notifications.compatibility(options), function () { console.log('updated') })
+    return id
   },
   clear (id, timeout) {
     setTimeout(function () {
