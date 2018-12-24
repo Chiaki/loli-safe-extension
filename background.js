@@ -16,14 +16,13 @@ browser.storage.local.get().then(function (items) {
 })
 
 browser.storage.onChanged.addListener(function (changes, namespace) {
-  for (const key in changes) {
+  for (const key in changes)
     config[key] = changes[key].newValue
-  }
 })
 
 const createMenus = function (refresh) {
-  if (!config) { config = {} }
-  if (!config.textDomain) { config.textDomain = 'https://safe.fiery.me' }
+  if (!config) config = {}
+  if (!config.textDomain) config.textDomain = 'https://safe.fiery.me'
 
   const uploadable = ['image', 'video', 'audio']
 
@@ -136,9 +135,8 @@ const createMenus = function (refresh) {
           token: config.textToken
         }
       }).then(function (list) {
-        if (refresh) {
+        if (refresh)
           notifications.create('basic', 'Refresh completed.')
-        }
 
         if (list.data.albums.length === 0) {
           browser.menus.create({
@@ -234,11 +232,10 @@ const upload = function (url, pageURL, albumid) {
       }
     }
 
-    if (config.textToken) { options.headers['token'] = config.textToken }
+    if (config.textToken) options.headers['token'] = config.textToken
 
-    if (albumid && config.textToken) {
+    if (albumid && config.textToken)
       options.url = `${options.url}/${albumid}`
-    }
 
     axios(options).then(function (response) {
       if (response.data.success === true) {
@@ -261,9 +258,8 @@ const upload = function (url, pageURL, albumid) {
 }
 
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if ('coordinates' in request) {
+  if ('coordinates' in request)
     console.log(request.coordinates)
-  }
 })
 
 const uploadScreenshot = function (blob, albumid) {
@@ -284,11 +280,10 @@ const uploadScreenshot = function (blob, albumid) {
     }
   }
 
-  if (config.textToken) { options.headers['token'] = config.textToken }
+  if (config.textToken) options.headers['token'] = config.textToken
 
-  if (albumid && config.textToken) {
+  if (albumid && config.textToken)
     options.url = `${options.url}/${albumid}`
-  }
 
   axios(options).then(function (response) {
     if (response.data.success === true) {
@@ -364,16 +359,15 @@ const b64toBlob = function (b64Data, contentType, sliceSize) {
     const slice = byteCharacters.slice(offset, offset + sliceSize)
 
     const byteNumbers = new Array(slice.length)
-    for (let i = 0; i < slice.length; i++) {
+    for (let i = 0; i < slice.length; i++)
       byteNumbers[i] = slice.charCodeAt(i)
-    }
 
     const byteArray = new Uint8Array(byteNumbers)
 
     byteArrays.push(byteArray)
   }
 
-  const blob = new Blob(byteArrays, {type: contentType})
+  const blob = new Blob(byteArrays, { type: contentType })
   return blob
 }
 
@@ -390,9 +384,8 @@ const notifications = {
       delete options.progress
     }
 
-    if (options.type !== 'basic') {
+    if (options.type !== 'basic')
       options.type = 'basic'
-    }
 
     if (options.contextMessage) {
       options.message = `${options.message}\n${options.contextMessage}`
@@ -409,14 +402,12 @@ const notifications = {
       iconUrl: 'logo-128x128.png'
     }
 
-    if (altText) {
+    if (altText)
       notificationContent.contextMessage = altText
-    }
 
     progress = parseInt(progress)
-    if (!isNaN(progress)) {
+    if (!isNaN(progress))
       notificationContent.progress = progress
-    }
 
     const id = `lolisafe_${Date.now()}`
     notifications.caches.set(id, notificationContent)
@@ -433,11 +424,10 @@ const notifications = {
 
     if (!defined) {
       const cache = notifications.caches.get(id)
-      if (!cache) { return }
+      if (!cache) return
       properties.map(function (property) {
-        if (options[property] === undefined) {
+        if (options[property] === undefined)
           options[property] = cache[property]
-        }
       })
     }
 

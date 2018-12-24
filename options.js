@@ -5,9 +5,8 @@ const background = browser.extension.getBackgroundPage()
 
 document.addEventListener('DOMContentLoaded', function () {
   storage.get(items => {
-    for (const key in items) {
+    for (const key in items)
       document.getElementById(key).value = items[key]
-    }
   })
 })
 
@@ -27,12 +26,11 @@ document.getElementById('save').addEventListener('click', function () {
   const textToken = document.getElementById('textToken').value || null
 
   if (textDomain) {
-    if (!/^https?:\/\//.test(textDomain)) {
+    if (!/^https?:\/\//.test(textDomain))
       return alert('Domain must begin with a valid HTTP/HTTPS protocol.')
-    }
-    if (/\/$/.test(textDomain)) {
+
+    if (/\/$/.test(textDomain))
       return alert('Domain should not have a trailing slash.')
-    }
   }
 
   storage.set({ textDomain, textToken }).then(function () {
