@@ -226,9 +226,9 @@ const upload = function (url, pageURL, albumid) {
       data,
       headers: {},
       onUploadProgress (progress) {
-        notifications.update(notification, {
+        /*notifications.update(notification, {
           progress: Math.round((progress.loaded * 100) / progress.total)
-        })
+        })*/
       }
     }
 
