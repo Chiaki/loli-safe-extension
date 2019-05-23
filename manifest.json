@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "lolisafe Uploader",
+  "name": "lolisafe.kawaii Uploader",
   "description": "Uploader for lolisafe",
-  "version": "2018.10.25.0",
+  "version": "1.0.0",
   "options_ui": {
     "browser_style": true,
     "page": "options.html"
@@ -29,7 +29,7 @@
   },
   "applications": {
     "gecko": {
-      "id": "lolisafe-extension@BobbyWibowoB.addons.mozilla.org"
+      "id": "lolisafe-extension@nyanpansu.addons.mozilla.org"
     }
   }
 }
